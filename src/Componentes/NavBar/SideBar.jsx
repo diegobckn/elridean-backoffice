@@ -235,7 +235,7 @@ export default function PermanentDrawerLeft() {
                         to={subItem.link}
                         style={{
                           textDecoration: "none",
-                          color: "inherit",
+                          // color: "inherit",
                           width:"100%",
                           backgroundColor:(currentUrl + subCurrentUrl == subItem.link ? "#A0A0A0" : "transparent"),
                           color: "black"

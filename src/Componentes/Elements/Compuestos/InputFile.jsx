@@ -161,7 +161,6 @@ const InputFile = ({
         flexDirection: "row",
         alignContent: "center",
         alignItems: "center",
-        marginTop: "25px"
       }}>
 
         <TextField
