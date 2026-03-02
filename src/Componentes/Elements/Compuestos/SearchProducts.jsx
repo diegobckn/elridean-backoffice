@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import axios from "axios";
 import {
   Box,
@@ -25,14 +25,20 @@ import SearchIcon from "@mui/icons-material/Search"; // Importar el ícono de b�
 import ModelConfig from "../../../Models/ModelConfig";
 import { SelectedOptionsContext } from "../../Context/SelectedOptionsProvider";
 import Product from "../../../Models/Product";
+import Model from "../../../Models/Model";
+import System from "../../../Helpers/System";
 
 const SearchProducts = ({
   onProductSelect,
   labelInput = "Buscar producto...",
-  textButton = "Buscar"
+  textButton = "Buscar",
+  focus = true,
+  agregarSiEsUnico = false
 }) => {
+
+  const inputRef = useRef(null)
+
   const { showLoading, hideLoading } = useContext(SelectedOptionsContext);
-  const apiUrl = ModelConfig.get().urlBase;
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -63,9 +69,14 @@ const SearchProducts = ({
         pagina: 1, // Pagina 1 para la busqueda
       },
       (prods) => {
-        setFilteredProducts(prods); // Actualiza los productos filtrados
         hideLoading();
         setSearched(true); // Marca que se ha realizado una búsqueda
+        if (agregarSiEsUnico && prods.length == 1) {
+          handleAddProduct(prods[0])
+          setFilteredProducts([]); // Actualiza los productos filtrados
+        } else {
+          setFilteredProducts(prods); // Actualiza los productos filtrados
+        }
       },
       () => {
         hideLoading();
@@ -109,11 +120,28 @@ const SearchProducts = ({
     }
   };
 
+  const cargaAnteriorDeSesion = async (funSet, propiedad) => {
+    const anterior = await Model.getInstance().cargarDeSesion1(propiedad)
+    funSet(anterior)
+  }
+
+  useEffect(() => {
+    if (window.location.href.indexOf("stockmobile") > -1) {
+      cargaAnteriorDeSesion(setSearchTerm, "ultimaBusquedaStockMobile")
+    }
+    console.log("cambio focus", focus)
+    if (focus && inputRef) {
+      System.intentarFoco(inputRef)
+    }
+  }, [focus])
+
+
   return (
     <Box sx={{ p: 2, mb: 4 }}>
       <Grid container spacing={2} alignItems="stretch">
         <Grid item xs={12}>
           <TextField
+            ref={inputRef}
             fullWidth
             margin="dense"
             label={labelInput}
@@ -163,7 +191,7 @@ const SearchProducts = ({
                 }}
               >
                 <Grid container spacing={2}>
-                  <Grid item xs={3}>
+                  <Grid item xs={12} sm={12} md={3} lg={3}>
                     <Table>
                       <TableHead>
                         <TableRow>
@@ -181,14 +209,14 @@ const SearchProducts = ({
                             align="center"
                             sx={{ padding: "6px", fontSize: "14px" }}
                           >
-                            <strong>{prod.nombre}</strong>
+                            <strong> {prod.nombre} <br /> #{prod.idProducto}</strong>
                           </TableCell>
                         </TableRow>
                       </TableBody>
                     </Table>
                   </Grid>
 
-                  <Grid item xs={3}>
+                  <Grid item xs={6} sm={6} md={3} lg={3}>
                     <Table>
                       <TableHead>
                         <TableRow>
@@ -213,7 +241,7 @@ const SearchProducts = ({
                     </Table>
                   </Grid>
 
-                  <Grid item xs={3}>
+                  <Grid item xs={6} sm={6} md={3} lg={3}>
                     <Table>
                       <TableHead>
                         <TableRow>
@@ -238,7 +266,7 @@ const SearchProducts = ({
                     </Table>
                   </Grid>
 
-                  <Grid item xs={3} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                  <Grid item xs={12} sm={12} md={3} lg={3} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                     <Button
                       variant="contained"
                       color="secondary"

@@ -7,9 +7,10 @@ import Button from "@mui/material/Button";
 import Add from "@mui/icons-material/Add";
 import Modal from "@mui/joy/Modal";
 import SearchListProducts from "../Componentes/Productos/SearchListProduct";
-import { HorizontalSplit } from "@mui/icons-material";
+import { HorizontalSplit, LabelImportantOutlined } from "@mui/icons-material";
 import CrearProductosSinCodigo from "../Componentes/Productos/SinCodigo/Crear";
 import CrearProductosConCodigo from "../Componentes/Productos/ConCodigo/Crear";
+import ImprimirEtiquetas from "../Componentes/Productos/ImprimirEtiquetas";
 
 const Productos = () => {
 
@@ -19,6 +20,8 @@ const Productos = () => {
   const [open, setOpen] = useState(false);
 
   const [open2, setOpen2] = useState(false);
+
+  const [showImpEtiquetas, setShowImpEtiquetas] = useState(false);
 
   const handleOpenStepper = () => {
     setOpen(true);
@@ -45,23 +48,36 @@ const Productos = () => {
           style={{ marginLeft: "18px", padding: "14px", marginTop: "6px" }}
           onClick={handleOpenStepper}
         >
-          <Add/>
+          <Add />
           Producto sin código
         </Button>
         <Button
           size="large"
           variant="outlined"
           style={{ marginLeft: "18px", padding: "14px", marginTop: "6px" }}
-          
+
           onClick={handleOpenStepper2}
         >
-          <HorizontalSplit sx={{transform: "rotate(270deg)"}}/>
+          <HorizontalSplit sx={{ transform: "rotate(270deg)" }} />
           <Add sx={{
-                width: "15px",
-                position: "relative",
-                left: "-7px"
-          }}/>
+            width: "15px",
+            position: "relative",
+            left: "-7px"
+          }} />
           Producto con código
+        </Button>
+        <Button
+          size="large"
+          variant="outlined"
+          style={{ marginLeft: "18px", padding: "14px", marginTop: "6px" }}
+          onClick={() => setShowImpEtiquetas(true)}
+        >
+          <LabelImportantOutlined sx={{
+            width: "15px",
+            position: "relative",
+            left: "-7px"
+          }} />
+          Imprimir Etiquetas
         </Button>
 
         <SearchListProducts
@@ -82,41 +98,47 @@ const Productos = () => {
               overflow: "auto", // Added scrollable feature
               // maxHeight: "100vh", // Adjust as needed
               // maxWidth: "180vw", // Adjust as needed
-              height:"90%",
-              paddingTop:"10px",
-              width:"75%",
-              margin:"2.5% auto"
+              height: "90%",
+              paddingTop: "10px",
+              width: "75%",
+              margin: "2.5% auto"
             }}
           >
-           {/* <StepperSI onSuccessAdd={()=>{ setRefresh(!refresh) }}/>  */}
-           <CrearProductosSinCodigo onSuccessAdd={()=>{ setRefresh(!refresh) }}/> 
+            {/* <StepperSI onSuccessAdd={()=>{ setRefresh(!refresh) }}/>  */}
+            <CrearProductosSinCodigo onSuccessAdd={() => { setRefresh(!refresh) }} />
           </Box>
         </Modal>
 
       </Box>
-        <Modal open={open2} onClose={handleCloseStepper2}>
-          <Box
-            sx={{
-              // position: "absolute",
-              // top: "50%",
-              // left: "50%",
-              // transform: "translate(-50%, -50%)",
-              bgcolor: "background.paper",
-              boxShadow: 24,
-              // p: 4,
-              overflow: "auto", // Added scrollable feature
-              // maxHeight: "100vh", // Adjust as needed
-              // maxWidth: "180vw", // Adjust as needed
-              height:"90%",
-              paddingTop:"10px",
-              width:"85%",
-              margin:"2.5% auto"
-            }}
-          >
-            {/* <StepperSI conCodigo={true} onSuccessAdd={()=>{ setRefresh(!refresh) }} /> */}
-            <CrearProductosConCodigo onSuccessAdd={()=>{ setRefresh(!refresh) }}/> 
-          </Box>
-        </Modal>
+      <Modal open={open2} onClose={handleCloseStepper2}>
+        <Box
+          sx={{
+            // position: "absolute",
+            // top: "50%",
+            // left: "50%",
+            // transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            // p: 4,
+            overflow: "auto", // Added scrollable feature
+            // maxHeight: "100vh", // Adjust as needed
+            // maxWidth: "180vw", // Adjust as needed
+            height: "90%",
+            paddingTop: "10px",
+            width: "85%",
+            margin: "2.5% auto"
+          }}
+        >
+          {/* <StepperSI conCodigo={true} onSuccessAdd={()=>{ setRefresh(!refresh) }} /> */}
+          <CrearProductosConCodigo onSuccessAdd={() => { setRefresh(!refresh) }} />
+        </Box>
+      </Modal>
+
+      <ImprimirEtiquetas
+        openDialog={showImpEtiquetas}
+        setOpenDialog={setShowImpEtiquetas}
+      />
+
     </div>
   );
 };

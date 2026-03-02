@@ -14,6 +14,7 @@ const Clientes = () => {
     setOpen(true);
   };
 
+  const [refreshList, setRefreshList] = useState(false)
   const handleCloseModal = () => {
     setOpen(false);
   };
@@ -46,14 +47,24 @@ const Clientes = () => {
           startDecorator={<Add />}
           onClick={handleOpenModal}
         >
-          CLIENTES
+          Crear nuevo
+        </Button>
+        <Button
+          variant="outlined"
+          color="primary"
+          sx={{
+            my: 1,
+            mx: 2,
+          }}
+          startDecorator={<Add />}
+          onClick={() => {
+            window.open(window.location.href + "/crear-por-qr")
+          }}
+        >
+          Crear con qr
         </Button>
 
-        <SearchListClientes />
-
-        <Box />
-
-
+        <SearchListClientes refreshList={refreshList} />
 
         {/* Modal for IngresoCL */}
 
@@ -62,6 +73,9 @@ const Clientes = () => {
             openDialog={open}
             setOpendialog={setOpen}
             onClose={handleCloseModal}
+            onSave={() => {
+              setRefreshList(!refreshList)
+            }}
           />
         )}
 

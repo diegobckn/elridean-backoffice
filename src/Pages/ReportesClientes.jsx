@@ -37,15 +37,15 @@ import axios from "axios";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ModelConfig from "../Models/ModelConfig";
+import System from "../Helpers/System";
 
-const ReportesClientes = () => {
-  const apiUrl = ModelConfig.get().urlBase; 
+export default () => {
+  const apiUrl = ModelConfig.get().urlBase;
   const [proveedores, setProveedores] = useState([]);
-  const [open, setOpen] = useState(false);
   const [selectedProveedor, setSelectedProveedor] = useState([]);
   const [openPagar, setOpenPagar] = useState(false);
   const [groupedProveedores, setGroupedProveedores] = useState([]);
-  
+
   const [openPaymentProcess, setOpenPaymentProcess] = useState(false);
   const [openPaymentGroupProcess, setOpenPaymentGroupProcess] = useState(false);
   const [metodoPago, setMetodoPago] = useState("");
@@ -76,9 +76,6 @@ const ReportesClientes = () => {
     direction: "asc",
   });
 
-  const [sortedProveedores, setSortedProveedores] = useState([]);
-  // const [documentCountsByRut, setDocumentCountsByRut] = useState({});
-
   const [openTransferenciaModal, setOpenTransferenciaModal] = useState(false);
   const [openTransferenciaModal2, setOpenTransferenciaModal2] = useState(false);
 
@@ -105,7 +102,6 @@ const ReportesClientes = () => {
       const response = await axios.get(
         `${apiUrl}/ReporteClientes/GetAllClientesDeudas`
       );
-      // "https://www.easyposdev.somee.com/api/ReporteClientes/GetAllClientesDeudas"
       setProveedores(response.data.clienteDeudaAlls);
     } catch (error) {
       console.error("Error fetching clientes:", error);
@@ -113,30 +109,8 @@ const ReportesClientes = () => {
   };
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      fetchClientes();
-    }, 3000); // Fetch users every 3 seconds
-
-    return () => clearInterval(intervalId);
+    fetchClientes();
   }, []);
-
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     fetchProveedores();
-  //   }, 3000); // Fetch users every 3 seconds
-
-  //   return () => clearInterval(intervalId); // Cleanup interval on component unmount
-  // }, []);
-
-  const handleClickOpen = (proveedor) => {
-    setSelectedProveedor(proveedor);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedProveedor(null);
-  };
 
   const handlePagarOpen = (rut) => {
     const filteredProveedores = proveedores.filter(
@@ -182,7 +156,7 @@ const ReportesClientes = () => {
     setOpenPaymentGroupProcess(false);
   };
 
-  
+
 
   const getTotalSelected = () => {
     if (paymentOrigin === "detalleProveedor" && selectedProveedor) {
@@ -210,7 +184,7 @@ const ReportesClientes = () => {
       switch (metodoPago) {
         case "TRANSFERENCIA":
           endpoint =
-          `${apiUrl}/Clientes/PostClientePagarDeudaTransferenciaByIdCliente`;
+            `${apiUrl}/Clientes/PostClientePagarDeudaTransferenciaByIdCliente`;
 
           // if (
           //   nombre === "" ||
@@ -317,7 +291,7 @@ const ReportesClientes = () => {
 
         case "EFECTIVO":
           endpoint =
-          `${apiUrl}/Clientes/PostClientePagarDeudaByIdCliente`;
+            `${apiUrl}/Clientes/PostClientePagarDeudaByIdCliente`;
 
           requestBody = {
             deudaIds: [
@@ -327,7 +301,8 @@ const ReportesClientes = () => {
                 total: selectedItem.total.toString(),
               },
             ],
-            montoPagado: montoAPagar,
+            // montoPagado: montoAPagar,
+            montoPagado: cantidadPagada,
             metodoPago: metodoPago,
             idUsuario: 0,
             // Add cash-specific fields here if needed
@@ -356,7 +331,7 @@ const ReportesClientes = () => {
         setSelectedBanco("")
         setTipoCuenta("")
         setNroCuenta("")
-       
+
         setNroOperacion("")
 
         setTimeout(() => {
@@ -373,7 +348,7 @@ const ReportesClientes = () => {
   };
 
 
- 
+
 
   const totalGeneral = proveedores.reduce(
     (acc, proveedor) => acc + proveedor.total,
@@ -508,13 +483,13 @@ const ReportesClientes = () => {
       setLoading(true);
 
       let endpoint =
-        "https://www.easypos.somee.com/api/Clientes/PostClientePagarDeudaByIdCliente";
+        apiUrl + "/Clientes/PostClientePagarDeudaByIdCliente";
 
       let requestBody = {};
 
       if (metodoPago === "TRANSFERENCIA") {
         endpoint =
-          "https://www.easypos.somee.com/api/Clientes/PostClientePagarDeudaTransferenciaByIdCliente";
+          apiUrl + "/Clientes/PostClientePagarDeudaTransferenciaByIdCliente";
 
         if (
           nombre === "" ||
@@ -555,7 +530,7 @@ const ReportesClientes = () => {
         };
       } else if (metodoPago === "CHEQUE") {
         endpoint =
-          "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaChequeByIdCliente";
+          apiUrl + "/Clientes/PostClientePagarDeudaChequeByIdCliente";
         requestBody = {
           montoPagado: montoAPagar,
           metodoPago: metodoPago,
@@ -569,7 +544,7 @@ const ReportesClientes = () => {
         };
       } else if (metodoPago === "EFECTIVO") {
         endpoint =
-        `${apiUrl}/Clientes/PostClientePagarDeudaEfectivoByIdCliente`;
+          `${apiUrl}/Clientes/PostClientePagarDeudaEfectivoByIdCliente`;
         requestBody = {
           montoPagado: montoAPagar,
           metodoPago: metodoPago,
@@ -640,7 +615,7 @@ const ReportesClientes = () => {
         setCantidadPagada(0);
         fetchClientes();
         handleDetailClose();
-    
+
 
 
         setTimeout(() => {
@@ -660,14 +635,14 @@ const ReportesClientes = () => {
   const handleGroupedPayment = async () => {
     try {
       setLoading(true);
-  
+
       let endpoint =
-      `${apiUrl}/Clientes/PostClientePagarDeudaByIdCliente`;
-  
+        `${apiUrl}/Clientes/PostClientePagarDeudaByIdCliente`;
+
       if (metodoPago === "TRANSFERENCIA") {
         endpoint =
-        `${apiUrl}/Clientes/PostClientePagarDeudaTransferenciaByIdCliente`;
-  
+          `${apiUrl}/Clientes/PostClientePagarDeudaTransferenciaByIdCliente`;
+
         if (
           nombre === "" ||
           rut === "" ||
@@ -683,33 +658,33 @@ const ReportesClientes = () => {
           setLoading(false);
           return;
         }
-  
+
         if (!validarRutChileno(rut)) {
           setTransferenciaError("El RUT ingresado NO es válido.");
           setLoading(false);
           return;
         }
       }
-  
+
       if (!metodoPago) {
         setError("Por favor, selecciona un método de pago.");
         setLoading(false);
         return;
       } else setError("");
-  
+
       const selectedDeudas = groupedProveedores.filter((deuda) => selectedIds.includes(deuda.id));
       if (selectedDeudas.length === 0) {
         setError("Por favor, selecciona al menos una deuda para pagar.");
         setLoading(false);
         return;
       }
-  
+
       const deudaIds = selectedDeudas.map((deuda) => ({
         idCuentaCorriente: deuda.id,
         idCabecera: deuda.idCabecera,
         total: deuda.total,
       }));
-  
+
       const requestBody = {
         deudaIds: deudaIds,
         montoPagado: montoAPagar,
@@ -726,14 +701,14 @@ const ReportesClientes = () => {
           nroOperacion: nroOperacion,
         } : null,
       };
-  
+
       console.log("Request Body:", requestBody);
-  
+
       const response = await axios.post(endpoint, requestBody);
-  
+
       console.log("Response:", response.data);
       console.log("ResponseStatus:", response.data.statusCode);
-  
+
       if (response.data.statusCode === 200) {
         setSnackbarOpen(true);
         setSnackbarMessage(response.data.descripcion);
@@ -744,7 +719,7 @@ const ReportesClientes = () => {
         handleTransferenciaModalClose2();
         handleClosePaymentGroupProcess();
         handlePagarClose();
-  
+
         setTimeout(() => {
           handleClosePaymentProcess();
         }, 2000);
@@ -757,8 +732,8 @@ const ReportesClientes = () => {
       setLoading(false);
     }
   };
-  
-  
+
+
 
   const compareRut = (a, b) => {
     if (!a || !b) return 0;
@@ -1025,7 +1000,7 @@ const ReportesClientes = () => {
                                     style={{
                                       color:
                                         order.field === "nroComprobante" &&
-                                        order.direction === "asc"
+                                          order.direction === "asc"
                                           ? "black"
                                           : "dimgrey",
                                     }}
@@ -1035,7 +1010,7 @@ const ReportesClientes = () => {
                                     style={{
                                       color:
                                         order.field === "nroComprobante" &&
-                                        order.direction === "desc"
+                                          order.direction === "desc"
                                           ? "black"
                                           : "dimgrey",
                                     }}
@@ -1048,7 +1023,7 @@ const ReportesClientes = () => {
                                     style={{
                                       color:
                                         order.field === "fecha" &&
-                                        order.direction === "asc"
+                                          order.direction === "asc"
                                           ? "black"
                                           : "dimgrey",
                                     }}
@@ -1058,7 +1033,7 @@ const ReportesClientes = () => {
                                     style={{
                                       color:
                                         order.field === "fecha" &&
-                                        order.direction === "desc"
+                                          order.direction === "desc"
                                           ? "black"
                                           : "dimgrey",
                                     }}
@@ -1071,7 +1046,7 @@ const ReportesClientes = () => {
                                     style={{
                                       color:
                                         order.field === "total" &&
-                                        order.direction === "asc"
+                                          order.direction === "asc"
                                           ? "black"
                                           : "dimgrey",
                                     }}
@@ -1081,7 +1056,7 @@ const ReportesClientes = () => {
                                     style={{
                                       color:
                                         order.field === "total" &&
-                                        order.direction === "desc"
+                                          order.direction === "desc"
                                           ? "black"
                                           : "dimgrey",
                                     }}
@@ -1201,6 +1176,7 @@ const ReportesClientes = () => {
                       <TableCell>Cantidad</TableCell>
                       <TableCell>Precio Unidad</TableCell>
                       <TableCell>Costo</TableCell>
+                      <TableCell>Subtotal</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -1209,8 +1185,9 @@ const ReportesClientes = () => {
                         <TableRow key={detalle.codProducto}>
                           <TableCell>{detalle.descripcionProducto}</TableCell>
                           <TableCell>{detalle.cantidad}</TableCell>
-                          <TableCell>{detalle.precioUnidad}</TableCell>
-                          <TableCell>${detalle.costo}</TableCell>
+                          <TableCell>${System.formatMonedaLocal(detalle.precioUnidad, false)}</TableCell>
+                          <TableCell>${System.formatMonedaLocal(detalle.costo, false)}</TableCell>
+                          <TableCell>${System.formatMonedaLocal(detalle.cantidad * detalle.precioUnidad, false)}</TableCell>
                         </TableRow>
                       ))}
                   </TableBody>
@@ -1231,7 +1208,7 @@ const ReportesClientes = () => {
                   // onClick={handleOpenPaymentProcess}
                   onClick={() => handleOpenPaymentProcess()}
                 >
-                  Pagar Total $ ({selectedItem.total})
+                  Pagar $ {System.formatMonedaLocal(selectedItem.total, false)}
                 </Button>
               </Box>
             </div>
@@ -1442,9 +1419,9 @@ const ReportesClientes = () => {
                       paymentOrigin === "detalleProveedor"
                         ? selectedProveedor.total
                         : groupedProveedores.reduce(
-                            (acc, proveedor) => acc + proveedor.total,
-                            0
-                          )
+                          (acc, proveedor) => acc + proveedor.total,
+                          0
+                        )
                     );
                     handleChequeModalOpen();
                   }}
@@ -1500,84 +1477,25 @@ const ReportesClientes = () => {
       </Dialog>
 
 
-      <Dialog open={openPaymentProcess} onClose={handleClosePaymentProcess}>
+      <Dialog open={openPaymentProcess} onClose={handleClosePaymentProcess} maxWidth={"lg"} fullWidth>
         <DialogTitle>Procesamiento de Pago Detalle</DialogTitle>
         <DialogContent>
-          <Grid container spacing={2} item xs={12} md={6} lg={12}>
-            <Grid item xs={12} md={12} lg={12}>
-              {error && (
-                <Grid item xs={12}>
-                  <Typography variant="body1" color="error">
-                    {error}
-                  </Typography>
-                </Grid>
-              )}
-              <TextField
-                sx={{ marginBottom: "5%" }}
-                margin="dense"
-                label="Monto a Pagar"
-                variant="outlined"
-                // value={getTotalSelected()}
-                value={montoAPagar.toLocaleString("es-CL")}
-                fullWidth
-                inputProps={{
-                  inputMode: "numeric",
-                  pattern: "[0-9]*",
-                }}
-                InputProps={{ readOnly: true }}
-              />
-              <TextField
-                margin="dense"
-                fullWidth
-                label="Cantidad pagada"
-                value={cantidadPagada.toLocaleString("es-CL")}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (!value.trim()) {
-                    setCantidadPagada(0);
-                  } else {
-                    setCantidadPagada(parseFloat(value));
-                  }
-                }}
-                disabled={metodoPago !== "EFECTIVO"} // Deshabilitar la edición excepto para el método "EFECTIVO"
-                inputProps={{
-                  inputMode: "numeric",
-                  pattern: "[0-9]*",
-                  maxLength: 9,
-                }}
-              />
-              <TextField
-                margin="dense"
-                fullWidth
-                type="number"
-                label="Por pagar"
-                value={Math.max(0, montoAPagar - cantidadPagada).toLocaleString(
-                  "es-CL"
-                )}
-                InputProps={{ readOnly: true }}
-              />
-              {calcularVuelto() > 0 && (
-                <TextField
-                  margin="dense"
-                  fullWidth
-                  type="number"
-                  label="Vuelto"
-                  value={calcularVuelto()}
-                  InputProps={{ readOnly: true }}
-                />
-              )}
-            </Grid>
+
+          <Grid container spacing={2} item xs={12} sm={12} md={12} lg={12}>
 
             <Grid
               container
               spacing={2}
               item
+              xs={12}
               sm={12}
-              md={12}
-              lg={12}
+              md={6}
+              lg={6}
               sx={{ width: "100%", display: "flex", justifyContent: "center" }}
             >
-              <Typography sx={{ marginTop: "7%" }} variant="h6">
+              <Typography sx={{
+                marginTop: "10px"
+              }} variant="h6">
                 Selecciona Método de Pago:
               </Typography>
               <Grid item xs={12} sm={12} md={12}>
@@ -1606,9 +1524,9 @@ const ReportesClientes = () => {
                       paymentOrigin === "detalleProveedor"
                         ? selectedProveedor.total
                         : groupedProveedores.reduce(
-                            (acc, proveedor) => acc + proveedor.total,
-                            0
-                          )
+                          (acc, proveedor) => acc + proveedor.total,
+                          0
+                        )
                     );
                     handleChequeModalOpen();
                   }}
@@ -1634,26 +1552,115 @@ const ReportesClientes = () => {
                   Transferencia
                 </Button>
               </Grid>
-              <Grid item xs={12} sm={12}>
-                <Button
-                  sx={{ height: "100%" }}
-                  variant="contained"
+
+            </Grid>
+
+
+            <Grid
+              container
+              spacing={2}
+              item
+              xs={12}
+              sm={12}
+              md={6}
+              lg={6}
+              sx={{ width: "100%", display: "flex", justifyContent: "center" }}
+            >
+              <Grid item xs={12} sm={12} md={6} lg={6}>
+                {error && (
+                  <Grid item xs={12}>
+                    <Typography variant="body1" color="error">
+                      {error}
+                    </Typography>
+                  </Grid>
+                )}
+                <Typography sx={{
+                  marginTop: "10px"
+                }} variant="h6">
+                  Ingrese el monto a pagar
+                </Typography>
+                <TextField
+                  sx={{
+                    marginBottom: "5%",
+                    marginTop: "16px",
+                  }}
+                  margin="dense"
+                  label="Monto a Pagar"
+                  variant="outlined"
+                  // value={getTotalSelected()}
+                  value={montoAPagar.toLocaleString("es-CL")}
                   fullWidth
-                  color="secondary"
-                  disabled={!metodoPago || loading}
-                  // onClick={handlePayment}
-                  onClick={handleIndividualPayment}
-                >
-                  {loading ? (
-                    <>
-                      <CircularProgress size={20} /> Procesando...
-                    </>
-                  ) : (
-                    "Pagar"
+                  inputProps={{
+                    inputMode: "numeric",
+                    pattern: "[0-9]*",
+                  }}
+                  InputProps={{ readOnly: true }}
+                />
+                <TextField
+                  margin="dense"
+                  fullWidth
+                  label="Cantidad pagada"
+                  value={cantidadPagada.toLocaleString("es-CL")}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (!value.trim()) {
+                      setCantidadPagada(0);
+                    } else {
+                      setCantidadPagada(parseFloat(value));
+                    }
+                  }}
+                  disabled={metodoPago !== "EFECTIVO"} // Deshabilitar la edición excepto para el método "EFECTIVO"
+                  inputProps={{
+                    inputMode: "numeric",
+                    pattern: "[0-9]*",
+                    maxLength: 9,
+                  }}
+                />
+                <TextField
+                  margin="dense"
+                  fullWidth
+                  type="number"
+                  label="Por pagar"
+                  value={Math.max(0, montoAPagar - cantidadPagada).toLocaleString(
+                    "es-CL"
                   )}
-                </Button>
+                  InputProps={{ readOnly: true }}
+                />
+                {calcularVuelto() > 0 && (
+                  <TextField
+                    margin="dense"
+                    fullWidth
+                    type="number"
+                    label="Vuelto"
+                    value={calcularVuelto()}
+                    InputProps={{ readOnly: true }}
+                  />
+                )}
               </Grid>
             </Grid>
+
+
+            <Grid item xs={12} sm={12} md={12} lg={12}>
+              <Button
+                sx={{ height: "100%" }}
+                variant="contained"
+                fullWidth
+                color="secondary"
+                disabled={!metodoPago || loading}
+                // onClick={handlePayment}
+                onClick={handleIndividualPayment}
+              >
+                {loading ? (
+                  <>
+                    <CircularProgress size={20} /> Procesando...
+                  </>
+                ) : (
+                  "Pagar"
+                )}
+              </Button>
+            </Grid>
+
+
           </Grid>
         </DialogContent>
         <DialogActions>
@@ -2175,4 +2182,3 @@ const ReportesClientes = () => {
   );
 };
 
-export default ReportesClientes;

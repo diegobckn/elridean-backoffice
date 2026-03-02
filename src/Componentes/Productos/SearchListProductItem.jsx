@@ -32,6 +32,8 @@ import ModelConfig from "../../Models/ModelConfig";
 
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import Product from "../../Models/Product";
+import ProductSold from "../../Models/ProductSold";
+import System from "../../Helpers/System";
 
 const SearchListProductItem = ({
   product,
@@ -40,16 +42,44 @@ const SearchListProductItem = ({
   onDeleteClick
 }) => {
 
-  const apiUrl = ModelConfig.get().urlBase;
-  
-  useEffect(()=>{
+  const [image, setImage] = useState("")
+
+  useEffect(() => {
     // console.log("mostrando item de producto")
     // console.log(product)
 
-  },[])
+    Product.cargarImagen(product, (urlImagen) => {
+      // console.log("cargarImagen de ", product, "..resultado", urlImagen)
+      setImage(urlImagen)
+    })
+  }, [product])
   return (
     <TableRow key={index}>
-      <TableCell>{product.idProducto}</TableCell>
+      <TableCell>
+
+        <div style={{
+          textAlign: "center"
+        }}>
+
+          #{product.idProducto}
+          {image != "" && (
+            <>
+              <br />
+              <img
+                style={{
+                  "maxWidth": "60px",
+                  "borderRadius": "10px",
+                  "maxHeight": "60px",
+                }}
+                src={image}
+                alt=""
+              />
+            </>
+          )}
+
+        </div>
+
+      </TableCell>
       <TableCell>
         {product.nombre}
         <br />
@@ -68,15 +98,15 @@ const SearchListProductItem = ({
       </TableCell>
       <TableCell>
         <span style={{ color: "purple" }}>Precio Costo: </span>
-        {product.precioCosto} <br />
+        ${System.formatMonedaLocal(product.precioCosto, false)} <br />
         <span style={{ color: "purple" }}>Precio Venta: </span>
-        {product.precioVenta} <br />
+        ${System.formatMonedaLocal(ProductSold.createByValues(product).getPrecioCantidad(1), false)}<br />
       </TableCell>
       <TableCell>
-      <span style={{ color: "purple" }}>Stock Inicial: </span>
-      {product.stockInicial} <br />
-      <span style={{ color: "purple" }}>Stock Actual: </span>
-      {product.stockActual} <br />
+        <span style={{ color: "purple" }}>Stock Inicial: </span>
+        {product.stockInicial} <br />
+        <span style={{ color: "purple" }}>Stock Actual: </span>
+        {product.stockActual} <br />
         <span style={{ color: "purple" }}>Stock Crítico: </span>
         {product.stockCritico} <br />
       </TableCell>

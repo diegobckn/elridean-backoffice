@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import {
-  
+
   BrowserRouter as Router,
   Route,
   Routes,
   Navigate,
- } from 'react-router-dom';
+} from 'react-router-dom';
 
- 
+
 import Home from './Pages/Home';
 import Registro from './Pages/Registro';
 import Login from './Pages/Login';
@@ -30,6 +30,7 @@ import '../node_modules/@fontsource/roboto/400.css';
 import '../node_modules/@fontsource/roboto/500.css';
 import '../node_modules/@fontsource/roboto/700.css';
 import ReportesClientes from './Pages/ReportesClientes';
+import ReportesUsuarios from './Pages/ReportesUsuarios';
 import ReportesCtaCorriente from './Pages/ReportesCtaCorriente';
 import ReportesCtaCorrienteProv from './Pages/ReportesCtaCorrienteProv';
 import ReporteProductosStockCritico from './Pages/ReporteProductosStockCritico';
@@ -37,11 +38,14 @@ import ReporteCostoGanancia from './Pages/ReporteCostoGanancia';
 import RankingVentas from './Pages/RankingVentas';
 import RankingProductos from './Pages/RankingProductos';
 import RankingLibroVentas from './Pages/RankingLibroVentas';
+import RankingLibroVentasProducto from './Pages/RankingLibroVentasProducto';
 import RankingLibroCompras from './Pages/RankingLibroCompras';
 import ReporteMaestroProductos from './Pages/ReporteMaestroProductos';
 import Stock from './Pages/Stock/';
 import EntradaSalidaStock from './Pages/EntradaSalidaStock';
 import Preventas from './Pages/Preventas';
+import ReporteFlujo from './Pages/ReporteFlujo';
+import Envases from './Pages/Envases';
 
 import { SelectedOptionsProvider } from "./Componentes/Context/SelectedOptionsProvider";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -55,60 +59,73 @@ import Preventa from './Pages/PreventaSucursal';
 import ReporteZ from './Pages/ReporteZ';
 import ReporteCierreZ from './Pages/ReporteCierreZ';
 import ReporteStockValorizado from './Pages/ReporteStockValorizado';
+import CrearClienteQr from './Pages/CrearClienteQr';
+import ReporteMovStock from './Pages/ReporteMovStock';
+
+import Ofertas from './Pages/Ofertas'
+import Descuentos from './Pages/Descuentos';
 
 function App() {
   return (
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <SelectedOptionsProvider>
-          <Routes>
-            <Route path="/login" element={<Login/>} />
-            <Route path="/registro" element={<Registro />} />
-            <Route
-              path="/home"
-              element={<Home/>}
-            />
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <SelectedOptionsProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/registro" element={<Registro />} />
+          <Route
+            path="/home"
+            element={<Home />}
+          />
 
-            <Route
-              path="/"
-              element={<Home/>}
-            />
-            <Route path="/usuarios" element={<Usuarios />} />
-            <Route path="/sucursales" element={<Sucursales />} />
-            <Route path="/sucursales/metodoimpresion" element={<MetodoImpresion/>} />
-            <Route path="/sucursales/cajasucursal" element={<CajaSucursal />} />
-            <Route path="/sucursales/preventa" element={<Preventa />} />
-            <Route path="/sucursales/pasarelapago" element={<PasarelaPago />} />
-            <Route path="/precios" element={<Precios />} />
-            <Route path="/proveedores" element={<Proveedores />} />
-            <Route path="/clientes" element={<Clientes />} />
-            <Route path="/clientes/reportes" element={<ReportesClientes />} />
-            <Route path="/productos" element={<Productos />} />
-            <Route path="/productos/categorias" element={<Categorias />} />
-            <Route path="/productos/subcategorias" element={<SubCategorias />} />
-            <Route path="/productos/familias" element={<Familias />} />
-            <Route path="/productos/subfamilias" element={<SubFamilias />} />
-            <Route path="/proveedores/ingresodocumento" element={<IngresoDocumento />} />
-            <Route path="/proveedores/documentosporpagar" element={<ProveedoresDocumentosPorPagar />} />
-            <Route path="reportes" element={<Reportes />} />
-            <Route path="reportes/cuentacorrienteclientes" element={<ReportesCtaCorriente />} />
-            <Route path="reportes/cuentacorrienteproveedores" element={<ReportesCtaCorrienteProv />} />
-            <Route path="reportes/rankingventas" element={<RankingVentas />} />
-            <Route path="reportes/rankingproductos" element={<RankingProductos />} />
-            <Route path="reportes/rankinglibroventas" element={<RankingLibroVentas />} />
-            <Route path="reportes/stockcriticos" element={<ReporteProductosStockCritico />} />
-            <Route path="reportes/costosganancias" element={<ReporteCostoGanancia />} />
-            <Route path="reportes/rankinglibrocompras" element={<RankingLibroCompras />} />
-            <Route path="stock" element={<Stock />} />
-            <Route path="stock/entradasalidastock" element={<EntradaSalidaStock />} />
-            <Route path="stockmobile" element={<StockMobile />} />
-            <Route path="reportes/reportez" element={<ReporteZ />} />
-            <Route path="reportes/reportecierrez" element={<ReporteCierreZ />} />
-            <Route path="reportes/reportestockvalorizado" element={<ReporteStockValorizado />} />
-            <Route path="reportes/maestro-productos" element={<ReporteMaestroProductos />} />
-            <Route path="reportes/preventas" element={<Preventas />} />
-          </Routes>
-        </SelectedOptionsProvider>
-      </LocalizationProvider>
+          <Route
+            path="/"
+            element={<Home />}
+          />
+          <Route path="/usuarios" element={<Usuarios />} />
+          <Route path="/sucursales" element={<Sucursales />} />
+          <Route path="/sucursales/metodoimpresion" element={<MetodoImpresion />} />
+          <Route path="/sucursales/cajasucursal" element={<CajaSucursal />} />
+          <Route path="/sucursales/preventa" element={<Preventa />} />
+          <Route path="/sucursales/pasarelapago" element={<PasarelaPago />} />
+          <Route path="/precios" element={<Precios />} />
+          <Route path="/proveedores" element={<Proveedores />} />
+          <Route path="/clientes" element={<Clientes />} />
+          <Route path="/clientes/crear-por-qr" element={<CrearClienteQr />} />
+          <Route path="/clientes/reportes" element={<ReportesClientes />} />
+          <Route path="/usuarios/reportes" element={<ReportesUsuarios />} />
+          <Route path="/productos" element={<Productos />} />
+          <Route path="/productos/categorias" element={<Categorias />} />
+          <Route path="/productos/subcategorias" element={<SubCategorias />} />
+          <Route path="/productos/familias" element={<Familias />} />
+          <Route path="/productos/subfamilias" element={<SubFamilias />} />
+          <Route path="/proveedores/ingresodocumento" element={<IngresoDocumento />} />
+          <Route path="/proveedores/documentosporpagar" element={<ProveedoresDocumentosPorPagar />} />
+          <Route path="reportes" element={<Reportes />} />
+          <Route path="reportes/cuentacorrienteclientes" element={<ReportesCtaCorriente />} />
+          <Route path="reportes/cuentacorrienteproveedores" element={<ReportesCtaCorrienteProv />} />
+          <Route path="reportes/rankingventas" element={<RankingVentas />} />
+          <Route path="reportes/flujo" element={<ReporteFlujo />} />
+          <Route path="reportes/movstock" element={<ReporteMovStock />} />
+          <Route path="reportes/rankingproductos" element={<RankingProductos />} />
+          <Route path="reportes/rankinglibroventas" element={<RankingLibroVentas />} />
+          <Route path="reportes/rankinglibroventasproducto" element={<RankingLibroVentasProducto />} />
+          <Route path="reportes/stockcriticos" element={<ReporteProductosStockCritico />} />
+          <Route path="reportes/costosganancias" element={<ReporteCostoGanancia />} />
+          <Route path="reportes/rankinglibrocompras" element={<RankingLibroCompras />} />
+          <Route path="stock" element={<Stock />} />
+          <Route path="stock/entradasalidastock" element={<EntradaSalidaStock />} />
+          <Route path="stockmobile" element={<StockMobile />} />
+          <Route path="reportes/reportez" element={<ReporteZ />} />
+          <Route path="reportes/reportecierrez" element={<ReporteCierreZ />} />
+          <Route path="reportes/reportestockvalorizado" element={<ReporteStockValorizado />} />
+          <Route path="reportes/maestro-productos" element={<ReporteMaestroProductos />} />
+          <Route path="reportes/preventas" element={<Preventas />} />
+          <Route path="envases" element={<Envases />} />
+          <Route path="/ofertas" element={<Ofertas />} />
+          <Route path="/descuentos" element={<Descuentos />} />
+        </Routes>
+      </SelectedOptionsProvider>
+    </LocalizationProvider>
   );
 }
 

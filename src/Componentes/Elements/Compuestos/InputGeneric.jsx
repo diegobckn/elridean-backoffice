@@ -10,6 +10,7 @@ import ModelConfig from "../../../Models/ModelConfig";
 import { Check, Dangerous } from "@mui/icons-material";
 import User from "../../../Models/User";
 import Validator from "../../../Helpers/Validator";
+import System from "../../../Helpers/System";
 
 
 const InputGeneric = ({
@@ -24,7 +25,8 @@ const InputGeneric = ({
   maxLength = 20,
   required = false,
   vars = null,
-  onEnter = ()=>{}
+  onEnter = () => { },
+  readonly = false
 }) => {
 
   const {
@@ -72,20 +74,24 @@ const InputGeneric = ({
     setValidation(vl)
   }
   const checkKeyDown = (event) => {
-    if (!canAutoComplete && event.key == "Unidentified") {
+    if (System.isMobile()) {
+      setKeyPressed(true)
+      return
+    }
+    if (readonly || !canAutoComplete && event.key == "Unidentified") {
       event.preventDefault();
       return false
     } else {
       setKeyPressed(true)
     }
 
-    if(event.key == "Enter"){
+    if (event.key == "Enter") {
       onEnter()
     }
   }
 
   const checkChange = (event) => {
-    if (!canAutoComplete && !keyPressed) {
+    if (readonly || !canAutoComplete && !keyPressed) {
       return
     }
     const value = event.target.value
@@ -95,7 +101,7 @@ const InputGeneric = ({
     }
     // if (Validator.isNombre(value)) {
     //   // console.log(value + " es valido")
-      setGeneric(value);
+    setGeneric(value);
     // } else {
     //   // console.log("es incorrecta")
     //   showMessage("Valor erroneo")

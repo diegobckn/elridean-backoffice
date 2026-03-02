@@ -25,7 +25,7 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import FactCheckIcon from '@mui/icons-material/FactCheck';
 import { Button, IconButton, Typography } from "@mui/material";
-import { Settings } from "@mui/icons-material";
+import { LocalDrink, Settings } from "@mui/icons-material";
 import WarehouseIcon from '@mui/icons-material/Warehouse';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import ListAltIcon from '@mui/icons-material/ListAlt';
@@ -34,6 +34,9 @@ import ImportExportIcon from '@mui/icons-material/ImportExport';
 import ScreenDialogConfig from "../ScreenDialog/AdminConfig";
 import CONSTANTS from "../../definitions/Constants";
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
+
+import LocalOfferIcon from '@mui/icons-material/LocalOffer'; // Icono para Ofertas
+import PriceCheckIcon from '@mui/icons-material/PriceCheck';
 
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import CloseSession from '../ScreenDialog/CloseSession'
@@ -63,30 +66,35 @@ export default function PermanentDrawerLeft() {
     }));
   };
 
-  useEffect(()=>{
-    if(currentUrl == ""){
+  useEffect(() => {
+    if (currentUrl == "") {
       var urlArr = window.location.href.split("/")
-      if( urlArr.length > 4 ){
-        setSubCurrentUrl("/" + urlArr[4] )
+      if (urlArr.length > 4) {
+        setSubCurrentUrl("/" + urlArr[4])
       }
-      urlArr.splice(0,3)
+      urlArr.splice(0, 3)
       setCurrentUrl("/" + urlArr[0])
     }
 
 
-    if(menuItems.length == 0){
+    if (menuItems.length == 0) {
       var menuItemsBase = [
         { text: "Home", link: "/", icon: <HomeIcon /> },
-        { text: "Sucursales", link: "/sucursales", icon: <WarehouseIcon />,
+        {
+          text: "Sucursales", link: "/sucursales", icon: <WarehouseIcon />,
           subMenuItems: [
             { text: "Caja", link: "/sucursales/cajasucursal", icon: <PointOfSaleIcon /> },
             { text: "Preventa", link: "/sucursales/preventa", icon: <RequestQuoteIcon /> },
             // { text: "Método Impresión", link: "/sucursales/metodoimpresion", icon: <ReceiptLongIcon /> },
             // { text: "Pasarela de Pago", link: "/sucursales/pasarelapago", icon: <AddCardIcon/> },
-          ], 
+          ],
         }
         ,
-        { text: "Usuarios", link: "/usuarios", icon: <PeopleAltIcon /> },
+        {
+          text: "Usuarios", link: "/usuarios", icon: <PeopleAltIcon />, subMenuItems: [
+            { text: "Documentos por cobrar", link: "/usuarios/reportes", icon: <ReceiptIcon /> },
+          ],
+        },
         { text: "Precios", link: "/precios", icon: <PriceChangeIcon /> },
         {
           text: "Proveedores",
@@ -97,22 +105,32 @@ export default function PermanentDrawerLeft() {
             { text: "Documentos por pagar ", link: "/proveedores/documentosporpagar", icon: <ReceiptIcon /> },
           ],
         },
-        { text: "Clientes", link: "/clientes", icon: <GroupsIcon/>, subMenuItems: [
-          
-          { text: "Documentos por cobrar", link: "/clientes/reportes", icon: <ReceiptIcon /> },
-        ], },
-        
+        {
+          text: "Clientes", link: "/clientes", icon: <GroupsIcon />, subMenuItems: [
+            { text: "Documentos por cobrar", link: "/clientes/reportes", icon: <ReceiptIcon /> },
+          ],
+        },
+
         {
           text: "Productos",
           link: "/productos",
           icon: <CategoryIcon />,
           subMenuItems: [
-            { text: "Categorias", link: "/productos/categorias",icon: <CategoryIcon />},
-            { text: "Sub-Categorias", link: "/productos/subcategorias",icon: <PolylineIcon /> },
-            { text: "Familia", link: "/productos/familias",icon:<StackedBarChartIcon/> },
-            { text: "Sub-Familia", link: "/productos/subfamilias",icon:<SchemaOutlinedIcon/> },
+            { text: "Categorias", link: "/productos/categorias", icon: <CategoryIcon /> },
+            { text: "Sub-Categorias", link: "/productos/subcategorias", icon: <PolylineIcon /> },
+            { text: "Familia", link: "/productos/familias", icon: <StackedBarChartIcon /> },
+            { text: "Sub-Familia", link: "/productos/subfamilias", icon: <SchemaOutlinedIcon /> },
             // Add more sub-menu items as needed
           ],
+        },
+        {
+          text: "Envases",
+          link: "/envases",
+          icon: <LocalDrink />,
+          // subMenuItems: [
+          //   { text: "Entrada y Salida de Stock ", link: "/stock/entradasalidastock",icon: <ImportExportIcon/>},
+          // ]
+
         },
         {
           text: "Stock",
@@ -121,38 +139,50 @@ export default function PermanentDrawerLeft() {
           // subMenuItems: [
           //   { text: "Entrada y Salida de Stock ", link: "/stock/entradasalidastock",icon: <ImportExportIcon/>},
           // ]
-          
+
         },
 
- 
+        { text: "Descuentos", link: "/descuentos", icon: <PriceCheckIcon /> },
+
+        {
+          text: "Ofertas",
+          link: "/ofertas",
+          icon: <LocalOfferIcon />,
+
+        },
+
+
         {
           text: "Reportes",
           link: "/reportes",
 
           icon: <FactCheckIcon />,
           subMenuItems: [
-            { text: "Maestro de productos", link: "/reportes/maestro-productos",icon: <SummarizeIcon />},
-            { text: "Cuentas corrientes clientes", link: "/reportes/cuentacorrienteclientes",icon: <SummarizeIcon />},
-            { text: "Cuentas corrientes proveedores", link: "/reportes/cuentacorrienteproveedores",icon: <SummarizeIcon />},
-            { text: "Ranking de Venta por forma de pago", link: "/reportes/rankingventas",icon: <SummarizeIcon />},
-            { text: "Ranking de Venta de Productos", link: "/reportes/rankingproductos",icon: <SummarizeIcon />},
-            { text: "Reporte stock critico", link: "/reportes/stockcriticos",icon: <SummarizeIcon style={{color:"red"}}  />},
-            { text: "Reporte stock valorizado", link: "/reportes/reportestockvalorizado",icon: <SummarizeIcon style={{color:"springgreen"}}  />},
-            { text: "Reporte costos ganancias", link: "/reportes/costosganancias",icon: <SummarizeIcon />},
-            { text: "Libro de Ventas", link: "/reportes/rankinglibroventas",icon: <SummarizeIcon />},
-            { text: "Libro de Compras", link: "/reportes/rankinglibrocompras",icon: <SummarizeIcon />},
+            { text: "Maestro de productos", link: "/reportes/maestro-productos", icon: <SummarizeIcon /> },
+            { text: "Cuentas corrientes clientes", link: "/reportes/cuentacorrienteclientes", icon: <SummarizeIcon /> },
+            { text: "Cuentas corrientes proveedores", link: "/reportes/cuentacorrienteproveedores", icon: <SummarizeIcon /> },
+            { text: "Ranking de Venta por forma de pago", link: "/reportes/rankingventas", icon: <SummarizeIcon /> },
+            { text: "Ranking de Venta de Productos", link: "/reportes/rankingproductos", icon: <SummarizeIcon /> },
+            { text: "Reporte stock critico", link: "/reportes/stockcriticos", icon: <SummarizeIcon style={{ color: "red" }} /> },
+            { text: "Reporte stock valorizado", link: "/reportes/reportestockvalorizado", icon: <SummarizeIcon style={{ color: "springgreen" }} /> },
+            { text: "Reporte costos ganancias", link: "/reportes/costosganancias", icon: <SummarizeIcon /> },
+            { text: "Libro de Ventas", link: "/reportes/rankinglibroventas", icon: <SummarizeIcon /> },
+            { text: "Libro de Ventas Productos", link: "/reportes/rankinglibroventasproducto", icon: <SummarizeIcon /> },
+            { text: "Libro de Compras", link: "/reportes/rankinglibrocompras", icon: <SummarizeIcon /> },
             // { text: "Reporte Z", link: "/reportes/reportez",icon: <SummarizeIcon />},
-            { text: "Reporte Cierre Z", link: "/reportes/reportecierrez",icon: <SummarizeIcon />},
-            { text: "Preventas", link: "/reportes/preventas",icon: <SummarizeIcon />},
+            { text: "Reporte Cierre Z", link: "/reportes/reportecierrez", icon: <SummarizeIcon /> },
+            { text: "Preventas", link: "/reportes/preventas", icon: <SummarizeIcon /> },
+            { text: "Reporte Flujo", link: "/reportes/flujo", icon: <SummarizeIcon /> },
+            { text: "Reporte Mov stock", link: "/reportes/movstock", icon: <SummarizeIcon /> },
 
           ],
         },
         {
           text: "Config",
           link: "#",
-          
+
           icon: <Settings />,
-          action: ()=>{
+          action: () => {
             setShowScreenConfig(true)
           }
         },
@@ -160,35 +190,35 @@ export default function PermanentDrawerLeft() {
       setMenuItems(menuItemsBase)
     }
 
-    
 
-  },[])
 
-  useEffect(()=>{
+  }, [])
+
+  useEffect(() => {
     // console.log("cambio items")
-    menuItems.forEach((itemx,ix)=>{
-      if(itemx.link == currentUrl){
+    menuItems.forEach((itemx, ix) => {
+      if (itemx.link == currentUrl) {
         handleSubMenuClick(itemx.text)
       }
     })
 
-  },[menuItems])
+  }, [menuItems])
 
 
   return (
-    <Box sx={{ 
+    <Box sx={{
       display: "flex",
-      position:"relative"
-      }}>
+      position: "relative"
+    }}>
       <CssBaseline />
-      <GeneralElements/>
+      <GeneralElements />
       <Drawer
         sx={{
           width: drawerWidth,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
             width: drawerWidth,
-           
+
           },
         }}
         variant="permanent"
@@ -196,96 +226,99 @@ export default function PermanentDrawerLeft() {
       >
         <Divider />
         <List>
-          {currentUrl != "" && menuItems.length>0 && menuItems.map((item) => {
-            return(
-            <React.Fragment key={item.text}>
-              <ListItem disablePadding>
-                <Link
-                  onClick={()=>{
-                    {item.action && (
-                      item.action()
-                    )}
-                  }}
-                  to={item.link}
-                  style={{ 
-                    textDecoration: "none", 
-                    width:"100%",
-                    backgroundColor:(currentUrl == item.link ? "#4d4d4d" : "transparent"),
-                    color:(currentUrl == item.link ? "whitesmoke" : "black")
-                  }}
-                >
-                  <ListItemButton onClick={() => handleSubMenuClick(item.text)}>
-                    <ListItemIcon style={{
-                      backgroundColor:(currentUrl == item.link ? "#4d4d4d" : "transparent"),
-                      color:(currentUrl == item.link ? "whitesmoke" : "black")
-                    }}>{item.icon}</ListItemIcon>
-                    <ListItemText primary={item.text} />
-                    {item.subMenuItems ? (
-                      openSubMenu[item.text] ? <ExpandLess /> : <ExpandMore />
-                    ) : null}
-                  </ListItemButton>
-                </Link>
-              </ListItem>
-              {item.subMenuItems && openSubMenu[item.text] && (
-                <List component="div" disablePadding>
-                  {item.subMenuItems.map((subItem) => {
-                    return(
-                    <ListItem key={subItem.text} disablePadding>
-                      <Link
-                        to={subItem.link}
-                        style={{
-                          textDecoration: "none",
-                          // color: "inherit",
-                          width:"100%",
-                          backgroundColor:(currentUrl + subCurrentUrl == subItem.link ? "#A0A0A0" : "transparent"),
-                          color: "black"
-                        }}
-                        >
+          {currentUrl != "" && menuItems.length > 0 && menuItems.map((item) => {
+            return (
+              <React.Fragment key={item.text}>
+                <ListItem disablePadding>
+                  <Link
+                    onClick={() => {
+                      {
+                        item.action && (
+                          item.action()
+                        )
+                      }
+                    }}
+                    to={item.link}
+                    style={{
+                      textDecoration: "none",
+                      width: "100%",
+                      backgroundColor: (currentUrl == item.link ? "#4d4d4d" : "transparent"),
+                      color: (currentUrl == item.link ? "whitesmoke" : "black")
+                    }}
+                  >
+                    <ListItemButton onClick={() => handleSubMenuClick(item.text)}>
+                      <ListItemIcon style={{
+                        backgroundColor: (currentUrl == item.link ? "#4d4d4d" : "transparent"),
+                        color: (currentUrl == item.link ? "whitesmoke" : "black")
+                      }}>{item.icon}</ListItemIcon>
+                      <ListItemText primary={item.text} />
+                      {item.subMenuItems ? (
+                        openSubMenu[item.text] ? <ExpandLess /> : <ExpandMore />
+                      ) : null}
+                    </ListItemButton>
+                  </Link>
+                </ListItem>
+                {item.subMenuItems && openSubMenu[item.text] && (
+                  <List component="div" disablePadding>
+                    {item.subMenuItems.map((subItem) => {
+                      return (
+                        <ListItem key={subItem.text} disablePadding>
+                          <Link
+                            to={subItem.link}
+                            style={{
+                              textDecoration: "none",
+                              color: "inherit",
+                              width: "100%",
+                              backgroundColor: (currentUrl + subCurrentUrl == subItem.link ? "#A0A0A0" : "transparent"),
+                              color: "black"
+                            }}
+                          >
 
-                        <ListItemButton>
-                          <ListItemIcon />
-                          <ListItemIcon>{subItem.icon}</ListItemIcon>
-                          <ListItemText primary={subItem.text} />
-                        </ListItemButton>
-                      </Link>
-                    </ListItem>
-                  )
-                }
-                )
-                }
-                </List>
-              )}
-            </React.Fragment>
+                            <ListItemButton>
+                              <ListItemIcon />
+                              <ListItemIcon>{subItem.icon}</ListItemIcon>
+                              <ListItemText primary={subItem.text} />
+                            </ListItemButton>
+                          </Link>
+                        </ListItem>
+                      )
+                    }
+                    )
+                    }
+                  </List>
+                )}
+              </React.Fragment>
+            )
+          }
           )}
-        )}
 
         </List>
-        <CloseSession openDialog={openSessionDialog} setOpenDialog={setOpenSessionDialog}/>
+        <CloseSession openDialog={openSessionDialog} setOpenDialog={setOpenSessionDialog} />
         <Typography sx={{
-          margin:"0 20px"
+          margin: "0 20px"
         }}>{CONSTANTS.appName + " - " + CONSTANTS.appVersion}</Typography>
-      
-      <div style={{
-            width: "100%",
-            position: "relative",
-            left: "0",
-            bottom: "0",
-            margin: "30px 0 0 0",
-            padding: "10px"
-      }}>
-        <Button
-          variant="outlined"
-          color="error"
-          onClick={()=>{
-            console.log("apreta logout")
-            setOpenSessionDialog(true)
-          }}
-          startIcon={<ExitToAppIcon />}
-          style={{
-          }}
+
+        <div style={{
+          width: "100%",
+          position: "relative",
+          left: "0",
+          bottom: "0",
+          margin: "30px 0 0 0",
+          padding: "10px"
+        }}>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={() => {
+              console.log("apreta logout")
+              setOpenSessionDialog(true)
+            }}
+            startIcon={<ExitToAppIcon />}
+            style={{
+            }}
           >
-          Cerrar Sesión
-        </Button>
+            Cerrar Sesión
+          </Button>
         </div>
 
       </Drawer>

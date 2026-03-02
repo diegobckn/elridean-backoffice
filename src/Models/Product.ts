@@ -1,18 +1,16 @@
-import StorageSesion from '../Helpers/StorageSesion.ts';
 import Model from './Model.ts';
 import BaseConfig from "../definitions/BaseConfig.ts";
 import axios from 'axios';
 import ModelConfig from './ModelConfig.ts';
 import System from '../Helpers/System.ts';
 import EndPoint from './EndPoint.ts';
-import dayjs from 'dayjs';
 
 
 class Product extends Model {
     idProducto: number | null = null;
     description: string | null = null;
     price: number = 0;
-    precioCosto: string | null | undefined;
+    precioCosto: string | number | null | undefined = 0;
 
 
     static instance: Product | null = null;
@@ -166,6 +164,8 @@ class Product extends Model {
             var url = configs.urlBase + "/ProductosTmp/GetProductos"
             url = url.replace("/api", "/api")
 
+            url += "?idEmpresa=" + configs.idEmpresa
+
             const response = await axios.get(url);
             if (
                 response.data.statusCode == 200
@@ -184,13 +184,16 @@ class Product extends Model {
 
     async getAllPaginate({
         pageNumber = 1,
-        rowPage = 10
+        rowPage = 10,
+        sucursal = 0
     }, callbackOk: any, callbackWrong: any) {
         try {
             const configs = ModelConfig.get()
             var url = configs.urlBase + "/ProductosTmp/GetProductosPaginados"
             url += "?pageNumber=" + pageNumber
             url += "&rowPage=" + rowPage
+            url += "&codigoSucursal=" + sucursal
+            url += "&idEmpresa=" + configs.idEmpresa
 
             const response = await axios.get(url);
             // console.log("API Response:", response.data);
@@ -234,6 +237,9 @@ class Product extends Model {
             + "&pageNumber=" + data.pageNumber
             + "&rowPage=" + data.rowPage
 
+        url += "&idEmpresa=" + configs.idEmpresa
+
+
         EndPoint.sendGet(url, (responseData: any, response: any) => {
             callbackOk(responseData, response);
         }, callbackWrong)
@@ -248,6 +254,8 @@ class Product extends Model {
             var url = configs.urlBase + "/ProductosTmp/GetProductosStockCriticoPaginados"
             url += "?pageNumber=" + pageNumber
             url += "&rowPage=" + rowPage
+            url += "&idEmpresa=" + configs.idEmpresa
+
 
             const response = await axios.get(url);
             // console.log("API Response:", response.data);
@@ -276,6 +284,8 @@ class Product extends Model {
             if (codigoCliente) {
                 url += "&codigoCliente=" + codigoCliente
             }
+            url += "&idEmpresa=" + configs.idEmpresa
+
             const response = await axios.get(url);
             if (
                 response.data.statusCode == 200
@@ -296,7 +306,8 @@ class Product extends Model {
         description,
         codigoCliente,
         canPorPagina = 10,
-        pagina = 1
+        pagina = 1,
+        sucursal = 0
     }: any, callbackOk: any, callbackWrong: any) {
         try {
             const configs = ModelConfig.get()
@@ -308,6 +319,7 @@ class Product extends Model {
             url += "&pageNumber=" + pagina
             url += "&rowPage=" + canPorPagina
             url += "&idEmpresa=" + configs.idEmpresa
+            url += "&codigoSucursal=" + sucursal
             const response = await axios.get(url);
             if (
                 response.data.statusCode == 200
@@ -332,6 +344,7 @@ class Product extends Model {
             if (codigoCliente) {
                 url += "&codigoCliente=" + codigoCliente
             }
+            url += "&idEmpresa=" + configs.idEmpresa
             const response = await axios.get(url);
             if (
                 response.data.statusCode == 200
@@ -348,30 +361,25 @@ class Product extends Model {
         }
     }
 
-    async findByCodigoBarras({ codigoProducto, codigoCliente }: any, callbackOk: any, callbackWrong: any) {
-        try {
-            const configs = ModelConfig.get()
-            var url = configs.urlBase +
-                "/ProductosTmp/GetProductosByCodigoBarra?codbarra=" + codigoProducto
-            if (codigoCliente) {
-                url += "&codigoCliente=" + codigoCliente
-            }
-            url += "&idEmpresa=" + configs.idEmpresa
-
-            const response = await axios.get(url);
-            if (
-                response.data.statusCode == 200
-                || response.data.statusCode == 201
-
-            ) {
-                callbackOk(response.data.productos, response);
-            } else {
-                callbackWrong("respuesta incorrecta del servidor")
-            }
-        } catch (error) {
-            console.error("Error fetching products:", error);
-            callbackWrong(error)
+    async findByCodigoBarras({
+        codigoProducto,
+        codigoCliente,
+        sucursal = 0
+    }: any, callbackOk: any, callbackWrong: any) {
+        const configs = ModelConfig.get()
+        var url = configs.urlBase +
+            "/ProductosTmp/GetProductosByCodigoBarra?codbarra=" + codigoProducto
+        if (codigoCliente) {
+            url += "&codigoCliente=" + codigoCliente
         }
+        url += "&idEmpresa=" + configs.idEmpresa
+        url += "&codigoSucursal=" + sucursal
+
+        EndPoint.sendGet(url, (responseData: any, response: any) => {
+            callbackOk(responseData.productos, response)
+        }, (err: any) => {
+            callbackWrong(err)
+        })
     }
 
     async update(data: any, callbackOk: any, callbackWrong: any) {
@@ -379,6 +387,8 @@ class Product extends Model {
             const configs = ModelConfig.get()
             var url = configs.urlBase +
                 "/ProductosTmp/UpdateProducto"
+            url += "?idEmpresa=" + configs.idEmpresa
+
 
             const response = await axios.put(url, data);
             if (
@@ -412,6 +422,8 @@ class Product extends Model {
             const configs = ModelConfig.get()
             var url = configs.urlBase +
                 "/ProductosTmp/UpdateProductoPrecio"
+            url += "?idEmpresa=" + configs.idEmpresa
+
             data.codigoSucursal = 0;
             data.puntoVenta = ""
             data.codbarra = data.idProducto
@@ -452,6 +464,7 @@ class Product extends Model {
             const configs = ModelConfig.get()
             var url = configs.urlBase
                 + "/NivelMercadoLogicos/GetAllCategorias"
+            url += "?idEmpresa=" + configs.idEmpresa
 
             const response = await axios.get(
                 url
@@ -477,6 +490,7 @@ class Product extends Model {
             const configs = ModelConfig.get()
             var url = configs.urlBase
                 + "/NivelMercadoLogicos/GetSubCategoriaByIdCategoria?CategoriaID=" + categoriaId
+            url += "&idEmpresa=" + configs.idEmpresa
 
             const response = await axios.get(
                 url
@@ -509,6 +523,8 @@ class Product extends Model {
                 + "/NivelMercadoLogicos/GetFamiliaByIdSubCategoria?" +
                 "CategoriaID=" + categoryId +
                 "&SubCategoriaID=" + subcategoryId
+            url += "&idEmpresa=" + configs.idEmpresa
+
             const response = await axios.get(
                 url
             );
@@ -538,6 +554,7 @@ class Product extends Model {
                 "CategoriaID=" + categoryId +
                 "&SubCategoriaID=" + subcategoryId +
                 "&FamiliaID=" + familyId
+            url += "&idEmpresa=" + configs.idEmpresa
 
             const response = await axios.get(
                 url
@@ -574,6 +591,8 @@ class Product extends Model {
                 + "&idsubcategoria=" + subcatId
                 + "&idfamilia=" + famId
                 + "&idsubfamilia=" + subFamId
+            url += "&idEmpresa=" + configs.idEmpresa
+
 
             const response = await axios.get(
                 url
@@ -599,6 +618,8 @@ class Product extends Model {
             const configs = ModelConfig.get()
             var url = configs.urlBase
                 + "/ProductosTmp/ProductosVentaRapidaGet"
+            url += "?idEmpresa=" + configs.idEmpresa
+
 
             const response = await axios.get(
                 url
@@ -623,6 +644,7 @@ class Product extends Model {
             const configs = ModelConfig.get()
             var url = configs.urlBase
                 + "/ProductosTmp/ProductosVentaRapidaPost"
+            url += "?idEmpresa=" + configs.idEmpresa
 
             const response = await axios.post(
                 url
@@ -648,6 +670,7 @@ class Product extends Model {
             const configs = ModelConfig.get()
             var url = configs.urlBase
                 + "/ProductosTmp/ProductosVentaRapidaPut"
+            url += "?idEmpresa=" + configs.idEmpresa
 
             const response = await axios.put(
                 url
@@ -672,6 +695,7 @@ class Product extends Model {
             const configs = ModelConfig.get()
             var url = configs.urlBase
                 + "/ProductosTmp/UpdateProductoPrecio"
+            url += "?idEmpresa=" + configs.idEmpresa
 
             const response = await axios.put(
                 url
@@ -695,6 +719,7 @@ class Product extends Model {
             const configs = ModelConfig.get()
             var url = configs.urlBase
                 + "/ProductosTmp/AddProductoNoEncontrado"
+            url += "?idEmpresa=" + configs.idEmpresa
 
             const response = await axios.post(
                 url
@@ -721,6 +746,7 @@ class Product extends Model {
             const configs = ModelConfig.get()
             var url = configs.urlBase
                 + "/ProductosTmp/GetProductoTipos"
+            url += "?idEmpresa=" + configs.idEmpresa
 
             const response = await axios.get(
                 url
@@ -740,9 +766,10 @@ class Product extends Model {
     }
 
     static async addFull(data: any, callbackOk: any, callbackWrong: any) {
-
-        var url = ModelConfig.get("urlBase")
+        const configs = ModelConfig.get()
+        var url = configs.urlBase
             + "/ProductosTmp/AddProducto"
+        url += "?idEmpresa=" + configs.idEmpresa
 
         // if(!data.codigoSucursal) data.codigoSucursal = ModelConfig.get("sucursal")
         // if(!data.puntoVenta) data.puntoVenta = ModelConfig.get("puntoVenta")
@@ -755,8 +782,10 @@ class Product extends Model {
 
 
     static async addCategory(data: { descripcionCategoria: any }, callbackOk: any, callbackWrong: any) {
-        var url = ModelConfig.get("urlBase")
+        const configs = ModelConfig.get()
+        var url = configs.urlBase
             + "/NivelMercadoLogicos/AddCategoria"
+        url += "?idEmpresa=" + configs.idEmpresa
 
         // if(!data.codigoSucursal) data.codigoSucursal = ModelConfig.get("sucursal")
         // if(!data.puntoVenta) data.puntoVenta = ModelConfig.get("puntoVenta")
@@ -770,8 +799,10 @@ class Product extends Model {
 
 
     static async editCategory(data: { idCategoria: number, descripcionCategoria: string }, callbackOk: any, callbackWrong: any) {
-        var url = ModelConfig.get("urlBase")
+        const configs = ModelConfig.get()
+        var url = configs.urlBase
             + "/NivelMercadoLogicos/UpdateCategoria"
+        url += "?idEmpresa=" + configs.idEmpresa
 
         // if(!data.codigoSucursal) data.codigoSucursal = ModelConfig.get("sucursal")
         // if(!data.puntoVenta) data.puntoVenta = ModelConfig.get("puntoVenta")
@@ -787,8 +818,10 @@ class Product extends Model {
     static async deleteCategory(data: {
         Categoriaid: number
     }, callbackOk: any, callbackWrong: any) {
-        var url = ModelConfig.get("urlBase")
+        const configs = ModelConfig.get()
+        var url = configs.urlBase
             + "/NivelMercadoLogicos/DeleteCategoria"
+        url += "?idEmpresa=" + configs.idEmpresa
 
         // if(!data.codigoSucursal) data.codigoSucursal = ModelConfig.get("sucursal")
         // if(!data.puntoVenta) data.puntoVenta = ModelConfig.get("puntoVenta")
@@ -803,8 +836,10 @@ class Product extends Model {
         categoriaid: number,
         subcategoriaid: number
     }, callbackOk: any, callbackWrong: any) {
-        var url = ModelConfig.get("urlBase")
+        const configs = ModelConfig.get()
+        var url = configs.urlBase
             + "/NivelMercadoLogicos/DeleteSubCategoria"
+        url += "?idEmpresa=" + configs.idEmpresa
 
         // if(!data.codigoSucursal) data.codigoSucursal = ModelConfig.get("sucursal")
         // if(!data.puntoVenta) data.puntoVenta = ModelConfig.get("puntoVenta")
@@ -820,8 +855,10 @@ class Product extends Model {
         subcategoriaid: number,
         familiaid: number
     }, callbackOk: any, callbackWrong: any) {
-        var url = ModelConfig.get("urlBase")
+        const configs = ModelConfig.get()
+        var url = configs.urlBase
             + "/NivelMercadoLogicos/DeleteFamilia"
+        url += "?idEmpresa=" + configs.idEmpresa
 
         // if(!data.codigoSucursal) data.codigoSucursal = ModelConfig.get("sucursal")
         // if(!data.puntoVenta) data.puntoVenta = ModelConfig.get("puntoVenta")
@@ -838,8 +875,10 @@ class Product extends Model {
         familiaid: any,
         subfamiliaid: any,
     }, callbackOk: any, callbackWrong: any) {
-        var url = ModelConfig.get("urlBase")
+        const configs = ModelConfig.get()
+        var url = configs.urlBase
             + "/NivelMercadoLogicos/DeleteSubFamilia"
+        url += "?idEmpresa=" + configs.idEmpresa
 
         // if(!data.codigoSucursal) data.codigoSucursal = ModelConfig.get("sucursal")
         // if(!data.puntoVenta) data.puntoVenta = ModelConfig.get("puntoVenta")
@@ -852,9 +891,11 @@ class Product extends Model {
 
 
     static async addSubCategory(data: { idCategoria: number, descripcionSubCategoria: string }, callbackOk: any, callbackWrong: any) {
-        var url = ModelConfig.get("urlBase")
-            + "/NivelMercadoLogicos/AddSubCategoria"
 
+        const configs = ModelConfig.get()
+        var url = configs.urlBase
+            + "/NivelMercadoLogicos/AddSubCategoria"
+        url += "?idEmpresa=" + configs.idEmpresa
         // if(!data.codigoSucursal) data.codigoSucursal = ModelConfig.get("sucursal")
         // if(!data.puntoVenta) data.puntoVenta = ModelConfig.get("puntoVenta")
 
@@ -871,9 +912,11 @@ class Product extends Model {
         descripcionSubCategoria: string
     },
         callbackOk: any, callbackWrong: any) {
-        var url = ModelConfig.get("urlBase")
-            + "/NivelMercadoLogicos/UpdateSubCategoria"
 
+        const configs = ModelConfig.get()
+        var url = configs.urlBase
+            + "/NivelMercadoLogicos/UpdateSubCategoria"
+        url += "?idEmpresa=" + configs.idEmpresa
         // if(!data.codigoSucursal) data.codigoSucursal = ModelConfig.get("sucursal")
         // if(!data.puntoVenta) data.puntoVenta = ModelConfig.get("puntoVenta")
 
@@ -884,9 +927,11 @@ class Product extends Model {
 
 
     static async addFamily(data: { idCategoria: number, idSubcategoria: number, descripcionFamilia: string }, callbackOk: any, callbackWrong: any) {
-        var url = ModelConfig.get("urlBase")
-            + "/NivelMercadoLogicos/AddFamilia"
 
+        const configs = ModelConfig.get()
+        var url = configs.urlBase
+            + "/NivelMercadoLogicos/AddFamilia"
+        url += "?idEmpresa=" + configs.idEmpresa
         // if(!data.codigoSucursal) data.codigoSucursal = ModelConfig.get("sucursal")
         // if(!data.puntoVenta) data.puntoVenta = ModelConfig.get("puntoVenta")
 
@@ -903,9 +948,11 @@ class Product extends Model {
         idFamilia: number,
     },
         callbackOk: any, callbackWrong: any) {
-        var url = ModelConfig.get("urlBase")
-            + "/NivelMercadoLogicos/UpdateFamilia"
 
+        const configs = ModelConfig.get()
+        var url = configs.urlBase
+            + "/NivelMercadoLogicos/UpdateFamilia"
+        url += "?idEmpresa=" + configs.idEmpresa
         // if(!data.codigoSucursal) data.codigoSucursal = ModelConfig.get("sucursal")
         // if(!data.puntoVenta) data.puntoVenta = ModelConfig.get("puntoVenta")
 
@@ -921,9 +968,11 @@ class Product extends Model {
         idFamilia: number,
         descripcionSubFamilia: string
     }, callbackOk: any, callbackWrong: any) {
-        var url = ModelConfig.get("urlBase")
-            + "/NivelMercadoLogicos/AddSubFamilia"
 
+        const configs = ModelConfig.get()
+        var url = configs.urlBase
+            + "/NivelMercadoLogicos/AddSubFamilia"
+        url += "?idEmpresa=" + configs.idEmpresa
         // if(!data.codigoSucursal) data.codigoSucursal = ModelConfig.get("sucursal")
         // if(!data.puntoVenta) data.puntoVenta = ModelConfig.get("puntoVenta")
 
@@ -941,9 +990,11 @@ class Product extends Model {
         descripcionSubFamilia: string,
     },
         callbackOk: any, callbackWrong: any) {
-        var url = ModelConfig.get("urlBase")
-            + "/NivelMercadoLogicos/UpdateSubFamilia"
 
+        const configs = ModelConfig.get()
+        var url = configs.urlBase
+            + "/NivelMercadoLogicos/UpdateSubFamilia"
+        url += "?idEmpresa=" + configs.idEmpresa
         // if(!data.codigoSucursal) data.codigoSucursal = ModelConfig.get("sucursal")
         // if(!data.puntoVenta) data.puntoVenta = ModelConfig.get("puntoVenta")
 
@@ -952,6 +1003,136 @@ class Product extends Model {
         }, callbackWrong)
     }
 
+    static nombreImagen(producto: any, enElServidor = true, evitarCache = true) {
+        // console.log("nombreImagen de ", producto)
+        var nombreImg = ""
+        //revisamos si es un producto, categoria, subcategoria, familia o subfamilia
+        // segun que propiedad tiene
+        if (producto.nombre) {
+            nombreImg = (producto.nombre + ".jpg").toLowerCase()
+        } else if (producto.descripcion) {
+            nombreImg = (producto.descripcion + ".jpg").toLowerCase()
+        }
+
+        if (enElServidor) {
+            nombreImg = ModelConfig.get("urlBase") + "/imagenes/" + nombreImg
+            nombreImg = nombreImg.replace("/api/", "/")
+        }
+
+        if (evitarCache) {
+            var dt = new Date()
+            nombreImg = nombreImg + "?v=" + dt.getTime()
+        }
+        return nombreImg
+    }
+
+    static async cargarImagen(product: any, callbackOk: any) {
+        var url = this.nombreImagen(product, true, true)
+
+        try {
+            const response = await axios.get(url);
+            // console.log("response de cargarImagen", response)
+            callbackOk(url)
+        } catch (err) {
+            callbackOk(BaseConfig.productoSinImagen)
+        } finally {
+        }
+        // EndPoint.sendGet(url, (responseData: any, response: any) => {
+        //     callbackOk(BaseConfig.productoSinImagen)
+        // }, (err: any) => {
+        //     callbackOk(BaseConfig.productoSinImagen)
+        // })
+    }
+
+    static async signarImagen(product: any, fileInput: any, callbackOk: any, callbackWrong: any) {
+        var url = ModelConfig.get("urlBase")
+            + "/ImagenesBalanza/UploadImagenBalanza"
+
+        const nombreArchivoImagen = this.nombreImagen(product, false, false)
+        console.log("signarImagen")
+        console.log("nombreArchivoImagen", nombreArchivoImagen)
+
+        var formData = new FormData();
+        formData.append('file', fileInput, nombreArchivoImagen);
+
+        for (const value of formData.values()) {
+            console.log("item", value);
+        }
+
+        EndPoint.sendPost(url, formData, (responseData: any, response: any) => {
+            callbackOk(responseData, response);
+        }, (err: any) => {
+            callbackWrong(err)
+        }, {
+            headers: {
+                'Content-Type': 'multipart/form-data', // El servidor debe procesar esto
+            },
+        })
+    }
+
+    static base64ToBlob(base64: string, contentType: string) {
+        const base64Arr = base64.split(',')
+        var byteCharacters = ""
+        if (base64Arr.length > 1) {
+            byteCharacters = atob(base64Arr[1]); // Remove "data:image/png;base64," part
+        } else {
+            byteCharacters = atob(base64); // Remove "data:image/png;base64," part
+        }
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        return new Blob([byteArray], { type: contentType });
+    }
+
+    static async signarImagenResize(product: any, fileInput: any, callbackOk: any, callbackWrong: any) {
+        var me = this;
+        var url = "https://softus.com.ar/easypos/resize-image"
+
+        const nombreArchivoImagen = this.nombreImagen(product, false, false)
+        console.log("signarImagen")
+        console.log("nombreArchivoImagen", nombreArchivoImagen)
+
+        var formData = new FormData();
+        formData.append('file', fileInput, nombreArchivoImagen);
+        formData.append('maxwidth', "300");
+        formData.append('maxheight', "300");
+
+        for (const value of formData.values()) {
+            console.log("item", value);
+        }
+
+        EndPoint.sendPost(url, formData, (responseData: any, response: any) => {
+            console.log("responseData", responseData)
+            // callbackOk(responseData, response);
+            // return
+            if (responseData.image == "") {
+                callbackWrong("No se pudo subir la imagen. Consultar las condiciones a cumplir con las imagenes.")
+                return
+            }
+            const contentType = "image/jpg";
+            const blob = me.base64ToBlob(responseData.image, contentType);
+
+            me.signarImagen(product, blob, callbackOk, callbackWrong)
+        }, (err: any) => {
+            callbackWrong(err)
+        }, {
+            headers: {
+                'Content-Type': 'multipart/form-data', // El servidor debe procesar esto
+            },
+        })
+    }
+
+    static async crearRangoPrecios(arrayPrecios: any, callbackOk: any, callbackWrong: any) {
+        var url = ModelConfig.get("urlBase")
+            + "/ProductosTmp/AddProductoRangoPrecio"
+
+        EndPoint.sendPost(url, arrayPrecios, (responseData: any, response: any) => {
+            callbackOk(responseData, response);
+        }, callbackWrong)
+
+    }
 
 };
 

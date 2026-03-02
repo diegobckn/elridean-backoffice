@@ -27,10 +27,10 @@ import {
 import ModelConfig from "../../../../Models/ModelConfig";
 import { AttachMoney, CheckBox, DraftsOutlined, Money, Percent } from "@mui/icons-material";
 import Product from "../../../../Models/Product";
-import CONSTANTS from "../../../../definitions/Constants";
 import System from "../../../../Helpers/System";
 import { SelectedOptionsContext } from "../../../Context/SelectedOptionsProvider";
 import Model from "../../../../Models/Model";
+import UNIDADES from "../../../../definitions/Unidades";
 
 
 const Step3CC = ({
@@ -146,7 +146,7 @@ const Step3CC = ({
       },
     };
 
-    
+
 
     // console.log("Datos objeto productos", productoNuevo);
     showLoading("Creando producto " + step1Data.nombre)
@@ -240,8 +240,9 @@ const Step3CC = ({
       setEmptyFieldsMessage("Favor completar Stock Inicial.");
       return false;
     }
-    if (isNaN(parseFloat(stockInicial)) || parseFloat(stockInicial) === 0) {
-      setEmptyFieldsMessage("El stock inicial no puede ser cero.");
+    // if (isNaN(parseFloat(stockInicial)) || parseFloat(stockInicial) === 0) {
+    if (isNaN(parseFloat(stockInicial))) {
+      setEmptyFieldsMessage("Favor completar Stock Inicial.");
       return false;
     }
 
@@ -441,7 +442,7 @@ const Step3CC = ({
                 onChange={(e) => handleUnidadSelect(e.target.value)}
                 label="Seleccionar Unidad"
               >
-                {CONSTANTS.UNIDADES.map((unidad) => (
+                {UNIDADES.map((unidad) => (
                   <MenuItem key={unidad.idUnidad} value={unidad.idUnidad}>
                     {unidad.descripcion}
                   </MenuItem>
@@ -463,7 +464,7 @@ const Step3CC = ({
                 onChange={(e) => handleUnidadVentaSelect(e.target.value)}
                 label="Seleccionar Unidad"
               >
-                {CONSTANTS.UNIDADES.map((unidad) => (
+                {UNIDADES.map((unidad) => (
                   <MenuItem key={unidad.idUnidad} value={unidad.idUnidad}>
                     {unidad.descripcion}
                   </MenuItem>

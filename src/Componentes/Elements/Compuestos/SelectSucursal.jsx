@@ -23,8 +23,12 @@ const SelectSucursal = ({
   autoFocus = false,
   fieldName = "select",
   label = fieldName[0].toUpperCase() + fieldName.substr(1),
+  labelEmpty = "SELECCIONAR",
   required = false,
-  vars = null
+  vars = null,
+  setSucursales = (sucs) => { },
+  setSucursalSelected = (suc) => { },
+  onlyIds = []
 }) => {
 
   const {
@@ -80,9 +84,23 @@ const SelectSucursal = ({
   }
 
   const loadList = async () => {
-
     Sucursal.getAll((responseData, response) => {
-      setSelectList(responseData);
+      if (onlyIds.length > 0) {
+        var onlys = []
+        responseData.forEach((sucItem) => {
+          if (
+            onlyIds.includes(sucItem.idSucursal)
+            || onlyIds.includes(sucItem.idSucursal + "")
+          ) {
+            onlys.push(sucItem)
+          }
+        })
+        setSelectList(onlys);
+        setSucursales(onlys);
+      } else {
+        setSelectList(responseData);
+        setSucursales(responseData);
+      }
     }, (error) => {
       showMessage(error)
     })
@@ -99,9 +117,21 @@ const SelectSucursal = ({
     })
   }
 
+  const buscarInfoById = (sucursalId) => {
+    var found = null;
+    selectList.forEach((sucItem) => {
+      if (sucItem.idSucursal == sucursalId) {
+        found = sucItem
+      }
+    })
+
+    return found
+  }
+
   useEffect(() => {
     validate()
     setSelected(-1)
+    setSucursalSelected(null)
     loadList()
   }, [])
 
@@ -122,7 +152,18 @@ const SelectSucursal = ({
       validate()
     }
     // console.log("selected es:", selected)
+
+    if (selected == -1) {
+      setSucursalSelected(null)
+    } else {
+      setSucursalSelected(buscarInfoById(selected))
+    }
+
   }, [selected, selectList.length])
+
+  useEffect(() => {
+    loadList()
+  }, [onlyIds.length])
 
 
 
@@ -135,7 +176,8 @@ const SelectSucursal = ({
       )}
 
 
-      <Select
+      <TextField
+        select
         sx={{
           marginTop: "17px"
         }}
@@ -150,7 +192,7 @@ const SelectSucursal = ({
           key={-1}
           value={-1}
         >
-          SELECCIONAR
+          {labelEmpty}
         </MenuItem>
 
         {selectList.map((selectOption, ix) => (
@@ -161,7 +203,7 @@ const SelectSucursal = ({
             {selectOption.descripcionSucursal}
           </MenuItem>
         ))}
-      </Select>
+      </TextField>
     </>
   );
 };
